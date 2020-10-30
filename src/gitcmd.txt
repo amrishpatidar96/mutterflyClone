@@ -1,0 +1,173 @@
+While using git, for most part, you shouldn’t be working directly on the master branch.
+
+Any development work, or hotfixes, or research work that you do, you’ll typically create a new branch, and make changes to your code on that branch.
+
+If you are happy with your code changes on your branch, then you’ll merge it to the master branch.
+
+Or, if you created a branch to quickly test something by making some code change without the intention of keeping your code change, then after your testing, you can simply discard your code changes by deleting the branch that you created for your testing purpose. This way, the code in your master branch is not affected.
+
+This tutorial explains the following steps:
+
+Create a new dev branch
+Do your work on local dev branch
+Push dev branch from your local to central git repository
+Once your work is done, merge dev branch to master
+Finally, delete the dev branch from both local and central git repository
+ 
+
+
+
+ 
+For the impatient, here is the code snippet for the above steps:
+
+# Clone the git repo:
+git clone https://remote-git-repo-url/demoproject
+
+# Create new dev branch, do your work, and commit changes locally
+git checkout -b dev
+vi index.html
+git commit -m "Made the change.." index.html
+
+# Push your changes to remote dev branch
+git push --set-upstream origin dev
+
+# Merge dev branch to master
+git checkout master
+git merge dev
+
+# Finally, delete dev branch both locally and remote
+git branch -d dev
+git branch -d -r origin/dev
+For explanation and example output of the above steps, read the rest of the article.
+
+1. Create New Dev Branch
+In the following example, I’ve cloned demoproject from remote git repository to work on it locally.
+
+# git clone https://remote-git-repo-url/demoproject
+By default, the current working branch is master branch.
+
+# git status
+On branch master
+Your branch is up-to-date with 'origin/master'.
+
+nothing to commit, working tree clean
+The following commands displays all available branches for this repository (both local and remote).
+
+# git branch -a
+* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+As you see from the above output, there is no additional local or remote branch except the master branch.
+
+For more details on git branch command, refer to this: 15 Git Branch Command Examples to Create and Manage Branches
+
+So, to do our development work, let us create a new local dev branch as shown below.
+
+# git checkout -b dev
+Switched to a new branch 'dev'
+In the above:
+
+git checkout command will try to checkout the given branch.
+In our case, we don’t have a branch called “dev”. So, the above command will create a new “dev” branch.
+Once the empty dev branch is created, it will also switch to the dev branch and make that as our working branch.
+Verify that the new branch got created as shown below.
+
+# git branch -a
+* dev
+  master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+As you see from the above output, the * is now in front of dev, which indicates the current working branch is dev.
+
+The following git status command indicates that we are currently on the new “dev” branch.
+
+# git status
+On branch dev
+nothing to commit, working tree clean
+2. Work on your local Dev Branch
+Now that we have a new “dev” branch, start making your changes here. Any change that you do from now on will be only on the “dev” branch.
+
+In this example, let us make a change to index.html file.
+
+# vim index.html
+Commit the change to the dev branch. Since we are already inside the dev branch, any commit that we do will happen only on the dev branch.
+
+# git commit -a -m "Fixed email address"
+[dev b0147e6] Fixed email address
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+It’s important to understand that when we initially created our branch, it exists only locally on our local laptop. It’s better to push our local “dev” branch to the remote git repository.
+
+This way, you can push all your changes to the remote dev branch, and someone else who is working on the “dev” branch can then checkout the changes. Even if you are the only person who is working on the “dev” branch, it is still a good idea to push your local changes to remote git repo to keep a remote backup of your changes.
+
+When you do a git push at this stage, it will give the following error message, as we don’t have the “dev” branch in the remote git repository.
+
+# git push
+fatal: The current branch dev has no upstream branch.
+3. Push the dev Branch to Remote Git Repository Upstream
+The following git push command will create the remote “dev” branch if it doesn’t exists, and push all your local “dev” branch changes to the remote “dev” branch.
+
+# git push --set-upstream origin dev
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 307 bytes | 307.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0)
+To https://remote-git-repo-url/demoproject
+* [new branch]      dev -> dev
+Branch dev set up to track remote branch dev from origin.
+Now if you do a git branch -a, you'll see both local and remote "dev" branch.
+# git branch -a
+* dev
+ master
+ remotes/origin/HEAD -> origin/master
+ remotes/origin/dev
+ remotes/origin/master
+4. Merge Dev Branch to Master Branch
+Once you are done with your development work on the “dev” branch, and validated your changes, you may want to merge the changes to the master branch.
+
+For this, first switch your working branch from dev to master as shown below.
+
+# git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+Once you are in the master branch, execute git merge dev as shown below to merge the “dev” branch with master.
+
+# git merge dev
+Updating 03c769c..b0147e6
+Fast-forward
+ index.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+You’ll see the word “Fast-forward” in the above output. All git does in the master branch is to move the HEAD pointer in the master branch to the latest commit from the “dev” branch.
+
+Once the merge is done, make sure to do a git push, to push your changes to the remote repository.
+
+# git push
+Total 0 (delta 0), reused 0 (delta 0)
+To https://remote-git-repo-url/demoproject
+   03c769c..b0147e6  master -> master
+5. Cleanup After Merging to Master
+Now that you’e completed your development work, and merged the changes to master branch, you may want to delete your “dev” branch.
+
+To delete the dev branch, execute the following command.
+
+# git branch -d dev
+Deleted branch dev (was b0147e6).
+The above command deletes the branch only on your local git repository in your laptop.
+
+As you see from the following output, the “dev” branch is still in the remote git repository.
+
+# git branch -a
+* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/dev
+  remotes/origin/master
+The following command will delete the remote “dev” branch.
+
+# git branch -d -r origin/dev
+Deleted remote-tracking branch origin/dev (was b0147e6).
+After the above clean-up, now we just have only the master branch which includes all the development work that we recently did.
+
+# git branch -a
+* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
